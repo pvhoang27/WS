@@ -14,10 +14,13 @@
 //d. Kết thúc chương trình client.
 package CharacterService;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import vn.medianews.CharacterService;
 import vn.medianews.CharacterService_Service;
 
@@ -26,34 +29,43 @@ import vn.medianews.CharacterService_Service;
  * @author hoang
  */
 public class B21DCCN132_e36xPXlT_ChiaMangTheoSoNguyenAm {
-    public static void main(String[] args) throws Exception {
-        // Cấu hình thông tin
-        String msv = "B21DCCN132", qCode = "e36xPXlT"; 
-        // Tạo đối tượng dịch vụ từ web service
-        CharacterService_Service service = new CharacterService_Service();
-        CharacterService port = service.getCharacterServicePort();
-        // a. Triệu gọi phương thức requestStringArray từ server 
-        List<String> a = port.requestStringArray(msv, qCode);
-        System.out.println(a);
-        // b. Sắp xếp các chuỗi theo số lượng nguyên âm
-        Collections.sort(a, new Comparator<String>() {
-            @Override
-            public int compare(String s1, String s2) {
-                return dem(s1) - dem(s2);
-            }
-        });
-        // c. Triệu gọi phương thức submitCharacterStringArray để gửi mảng đã sắp xếp
-        port.submitCharacterStringArray(msv, qCode, a);
-        System.out.println(a);
-    }
-    // Hàm đếm số nguyên âm trong chuỗi
-    private static int dem(String str) {
+    public static int countVowels(String s) {
         int cnt = 0;
-        // Các ký tự nguyên âm
-        String ngAm = "aeiouAEIOU";
-        for (int i = 0; i < str.length(); i++) {
-            if (ngAm.indexOf(str.charAt(i)) != -1) cnt++;
+        String vowels = "ueoaiUEOAI";
+        for (char c : s.toCharArray()) {
+            if (vowels.indexOf(c) != -1) {
+                cnt++;
+            }
         }
         return cnt;
+    }
+    public static void main(String[] args) throws Exception{
+        String studentCode = "B21DCCN132", qCode = "e36xPXlT";
+        CharacterService_Service service = new CharacterService_Service();
+        CharacterService sv = service.getCharacterServicePort();
+        
+        List<String> a = sv.requestStringArray(studentCode, qCode);
+        System.out.println(a);
+        
+        // xử lý bài toán 
+        Map<Integer , List<String>> nhom = new HashMap<>();
+        
+        for(String word :  a){
+            int dem = countVowels(word);
+            if(!nhom.containsKey(dem)){
+                nhom.put(dem, new ArrayList<>());
+            }
+            nhom.get(dem).add(word);
+        }
+        List<String> result = new ArrayList<>();  
+        for (List<String> group : nhom.values()) {
+            // Sắp xếp các từ theo thứ tự từ điển trong mỗi nhóm
+            Collections.sort(group);
+            
+            // Tạo chuỗi liệt kê cách nhau bởi dấu phẩy
+            String joinedString = String.join(", ", group);
+            result.add(joinedString);
+        }
+        sv.submitCharacterStringArray(studentCode, qCode, result);
     }
 }
