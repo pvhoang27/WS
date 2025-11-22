@@ -1,0 +1,67 @@
+import RMI.DataService;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.util.ArrayList;
+import java.util.List;
+
+public class RMIClient {
+    public static void main(String[] args) {
+        try {
+            // 1. Kết nối tới Registry Server
+            // Lưu ý: Thay "localhost" bằng địa chỉ IP của Server thi (ví dụ: 172.188.19.20)
+            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+
+            // 2. Tìm kiếm dịch vụ từ xa
+            DataService service = (DataService) registry.lookup("RMIDataService");
+
+            // 3. Thông tin sinh viên và mã câu hỏi
+            String studentCode = "B21DCCN393"; // Thay mã sinh viên của bạn vào đây
+            String qCode = "sD8np9CE";
+
+            // 4. Triệu gọi phương thức requestData để nhận amount
+            // Server trả về Object, cần ép kiểu về int (hoặc Integer)
+            int amount = (int) service.requestData(studentCode, qCode);
+            System.out.println("Received amount: " + amount);
+
+            // 5. Xử lý thuật toán đổi tiền (Greedy)
+            int[] menhGia = {10, 5, 2, 1}; // Sắp xếp giảm dần để ưu tiên lấy số lớn trước
+            List<Integer> coinsUsed = new ArrayList<>();
+            int tempAmount = amount;
+
+            for (int coin : menhGia) {
+                while (tempAmount >= coin) {
+                    tempAmount -= coin;
+                    coinsUsed.add(coin);
+                }
+            }
+
+            // 6. Tạo chuỗi kết quả theo định dạng: "số_lượng; danh_sách_xu"
+            // Ví dụ: "4; 10,5,2,1"
+            StringBuilder resultBuilder = new StringBuilder();
+            resultBuilder.append(coinsUsed.size()).append(";"); 
+            
+            // Thêm các đồng xu vào chuỗi
+            for (int i = 0; i < coinsUsed.size(); i++) {
+                if (i == 0) {
+                     // Cẩn thận phần khoảng trắng sau dấu chấm phẩy nếu đề bài yêu cầu chặt chẽ
+                     // Dựa vào ví dụ "4; 10,5,2,1" -> Có thể có hoặc không có khoảng trắng sau dấu ;
+                     // Ở đây tôi để "; " (có cách) hoặc ";" tùy vào test case. 
+                     // Theo ví dụ đề bài: "4; 10,5,2,1" -> Có khoảng trắng sau dấu ;
+                     resultBuilder.append(" ").append(coinsUsed.get(i)); 
+                } else {
+                    resultBuilder.append(",").append(coinsUsed.get(i));
+                }
+            }
+            
+            String finalResult = resultBuilder.toString().trim(); // Xóa khoảng trắng thừa nếu có
+            System.out.println("Sending result: " + finalResult);
+
+            // 7. Gửi kết quả về Server
+            service.submitData(studentCode, qCode, finalResult);
+            System.out.println("Data submitted successfully!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
