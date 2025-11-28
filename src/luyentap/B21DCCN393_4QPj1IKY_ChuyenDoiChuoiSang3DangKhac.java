@@ -16,7 +16,7 @@
 //•	snake_case: "hello_world_example"
 //Mảng kết quả sẽ là ["HelloWorldExample", "helloWorldExample", "hello_world_example"], và sẽ được gửi lại server qua phương thức submitCharacter.
 //d. Kết thúc chương trình client.
-package CharacterService;
+package luyentap;
 
 import java.util.ArrayList;
 import java.util.List;

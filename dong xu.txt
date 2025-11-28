@@ -1,0 +1,58 @@
+import RMI.DataService;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.util.ArrayList;
+import java.util.List;
+
+public class RMIClient {
+    public static void main(String[] args) {
+        try {
+            // 1. Kết nối
+            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+            DataService service = (DataService) registry.lookup("RMIDataService");
+
+            // 2. Nhận dữ liệu
+            String studentCode = "B21DCCN393";
+            String qCode = "sD8np9CE";
+            int amount = (int) service.requestData(studentCode, qCode);
+            System.out.println("Received amount: " + amount);
+
+            // 3. Thuật toán tham lam (Greedy)
+            int[] menhGia = {10, 5, 2, 1};
+            List<Integer> coinsUsed = new ArrayList<>();
+            
+            for (int coin : menhGia) {
+                while (amount >= coin) {
+                    amount -= coin;
+                    coinsUsed.add(coin);
+                }
+            }
+
+            // --- PHẦN SỬA ĐỔI: DÙNG STRING ĐƠN GIẢN ---
+            
+            // Khởi tạo chuỗi với số lượng xu trước
+            // Ví dụ: "4;"
+            String result = coinsUsed.size() + ";"; 
+
+            for (int i = 0; i < coinsUsed.size(); i++) {
+                if (i == 0) {
+                    // Phần tử đầu tiên thì thêm khoảng trắng phía trước (theo ví dụ đề bài)
+                    result += " " + coinsUsed.get(i);
+                } else {
+                    // Các phần tử sau thì thêm dấu phẩy phía trước
+                    result += "," + coinsUsed.get(i);
+                }
+            }
+            
+            // Kết quả lúc này sẽ là: "4; 10,5,2,1"
+            System.out.println("Sending: " + result);
+            
+            // 4. Gửi kết quả
+            service.submitData(studentCode, qCode, result);
+            System.out.println("Done!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

@@ -12,7 +12,7 @@
 //•	Nhóm 1 nguyên âm: "grape, kiwi, pear"
 //Danh sách kết quả sẽ là ["apple, banana", "grape, kiwi, pear"], và danh sách này sẽ được gửi lại server qua phương thức submitCharacter.
 //d. Kết thúc chương trình client.
-package CharacterService;
+package luyentap;
 
 import java.util.ArrayList;
 import java.util.Collection;
